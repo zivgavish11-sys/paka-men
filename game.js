@@ -943,19 +943,26 @@ document.getElementById('btn-back-to-select').addEventListener('click', () => {
   showScreen('screen-select');
 });
 
-// ─── Canvas scaling — מגביל גובה ל-viewport ──────────────────────
+// ─── Canvas scaling — fits canvas inside available viewport ──────
 function fitCanvas() {
   const wrapper = document.getElementById('game-wrapper');
   const hud     = document.getElementById('hud');
+  const dpad    = document.getElementById('dpad');
+
+  // visualViewport.height accounts for mobile browser address bar;
+  // falls back to window.innerHeight on desktop
+  const vh = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
 
   const hudH  = hud.offsetHeight || 50;
-  // D-pad גלוי רק במכשיר מגע
-  const dpadH = window.matchMedia('(hover: none), (pointer: coarse)').matches ? 140 : 0;
+
+  // Read actual rendered dpad height — only on touch devices
+  const isTouchDevice = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  const dpadH = isTouchDevice ? (dpad.offsetHeight || 200) : 0;
 
   const availW = Math.min(window.innerWidth, 560);
-  const availH = window.innerHeight - hudH - dpadH - 4; // 4px buffer
+  const availH = vh - hudH - dpadH - 4; // 4px safety buffer
 
-  // שמור על יחס 560:620 — בחר את הקטן מבין שני האילוצים
+  // Maintain 560:620 aspect ratio — pick the smaller of both constraints
   const byWidth  = availW;
   const byHeight = Math.floor(availH * 560 / 620);
   const cssW     = Math.max(1, Math.min(byWidth, byHeight));
@@ -965,10 +972,16 @@ function fitCanvas() {
   canvas.style.width  = cssW + 'px';
   canvas.style.height = cssH + 'px';
 }
+
 window.addEventListener('resize', fitCanvas);
+// visualViewport fires when mobile browser address bar shows/hides
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', fitCanvas);
+}
 fitCanvas();
 
 // ─── טעינה ראשונית ──────────────────────────────────────────────
 preloadImages(() => {
-  // תמונות נטענו — ממשיכים
+  // Images loaded — re-run fitCanvas now that DOM is fully rendered
+  fitCanvas();
 });

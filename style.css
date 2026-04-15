@@ -300,6 +300,7 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
+  direction: ltr; /* prevent RTL from swapping left/right buttons */
 }
 
 .dpad-center {

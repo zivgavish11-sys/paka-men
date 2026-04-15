@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Repository
+
+- **Remote:** `https://github.com/zivgavish11-sys/paka-men.git`
+- **Branch:** `maim`
+- To push changes: `git add <files> && git commit -m "message" && git push`
+
 ## Running
 
 No server or build process. Open `index.html` directly in any modern browser (double-click or drag into browser).
