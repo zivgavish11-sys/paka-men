@@ -281,6 +281,50 @@ body {
   touch-action: none;
 }
 
+/* ─── כפתור בית ב-HUD ─── */
+#btn-home {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  line-height: 1;
+  opacity: 0.75;
+  transition: opacity 0.15s, background 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+#btn-home:hover { opacity: 1; background: rgba(255,255,255,0.1); }
+
+/* ─── אוברליי אישור יציאה ─── */
+#exit-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  z-index: 999;
+  direction: rtl;
+}
+#exit-overlay.visible { display: flex; }
+
+#exit-overlay p {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.1rem, 4vw, 1.5rem);
+  color: #FFD700;
+  text-align: center;
+}
+
+#exit-overlay .btn-row {
+  display: flex;
+  gap: 16px;
+}
+
 /* ─── D-pad ─── */
 #dpad {
   display: flex;
@@ -300,7 +344,6 @@ body {
   display: flex;
   align-items: center;
   gap: 4px;
-  direction: ltr; /* prevent RTL from swapping left/right buttons */
 }
 
 .dpad-center {
@@ -311,7 +354,7 @@ body {
 }
 
 .dpad-btn {
-  font-family: 'Rubik', sans-serif;
+  font-family: Arial, sans-serif;
   font-size: 1.3rem;
   width: 58px;
   height: 58px;
@@ -386,3 +429,4 @@ body {
   .char-avatar { width: 72px; height: 72px; }
   .arcade-title { font-size: clamp(1.6rem, 9vw, 2.4rem); }
 }
+  

@@ -64,6 +64,7 @@
     <div id="game-wrapper">
       <div id="hud">
         <div id="hud-left">
+          <button id="btn-home" title="יציאה">🏠</button>
           <span id="hud-score-label">ניקוד:</span>
           <span id="hud-score">0</span>
         </div>
@@ -84,9 +85,9 @@
           <button class="dpad-btn" id="btn-up">▲</button>
         </div>
         <div id="dpad-row-mid">
-          <button class="dpad-btn" id="btn-left">◀</button>
-          <div class="dpad-center"></div>
           <button class="dpad-btn" id="btn-right">▶</button>
+          <div class="dpad-center"></div>
+          <button class="dpad-btn" id="btn-left">◀</button>
         </div>
         <div id="dpad-row-bot">
           <button class="dpad-btn" id="btn-down">▼</button>
@@ -103,6 +104,16 @@
     <button id="btn-change-char" class="arcade-btn secondary">החלף דמות</button>
   </div>
 
+  <!-- ═══ אוברליי אישור יציאה ═══ -->
+  <div id="exit-overlay">
+    <p>בטוח שתרצה לצאת?</p>
+    <div class="btn-row">
+      <button id="btn-exit-yes" class="arcade-btn">כן, צא</button>
+      <button id="btn-exit-no" class="arcade-btn secondary">המשך לשחק</button>
+    </div>
+  </div>
+
   <script src="game.js"></script>
 </body>
 </html>
+ 

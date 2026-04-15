@@ -5,8 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Repository
 
 - **Remote:** `https://github.com/zivgavish11-sys/paka-men.git`
-- **Branch:** `maim`
-- To push changes: `git add <files> && git commit -m "message" && git push`
+- **Branch:** `maim` (GitHub renamed it to `main` on the remote — both point to the same branch)
+- **Workflow:** managed via **GitHub Desktop** — use it to commit and push changes
+- To push via CLI: `git add <files> && git commit -m "message" && git push origin maim`
 
 ## Running
 

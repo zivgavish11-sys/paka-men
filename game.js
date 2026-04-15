@@ -935,6 +935,24 @@ document.getElementById('btn-change-char').addEventListener('click', () => {
   showScreen('screen-select');
 });
 
+// ─── כפתור בית: אישור יציאה ───────────────────────────────────
+document.getElementById('btn-home').addEventListener('click', () => {
+  document.getElementById('exit-overlay').classList.add('visible');
+});
+
+document.getElementById('btn-exit-yes').addEventListener('click', () => {
+  document.getElementById('exit-overlay').classList.remove('visible');
+  if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+  selectedChar = null;
+  document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('start-prompt').classList.add('hidden');
+  showScreen('screen-select');
+});
+
+document.getElementById('btn-exit-no').addEventListener('click', () => {
+  document.getElementById('exit-overlay').classList.remove('visible');
+});
+
 document.getElementById('btn-add-player').addEventListener('click', () => {
   showScreen('screen-add-player');
 });
