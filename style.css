@@ -1,0 +1,387 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;700;900&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─────────────────────────────────────────────
+   בסיס: Rubik לכל הטקסט, Press Start 2P רק לכותרות ארקייד
+───────────────────────────────────────────── */
+body {
+  background: #000;
+  color: #fff;
+  font-family: 'Rubik', sans-serif;
+  direction: rtl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── מסכים ─── */
+.screen {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 16px;
+  direction: rtl;
+  text-align: center;
+  box-sizing: border-box;
+}
+.screen.active { display: flex; }
+
+/* ─── כותרת ארקייד (Press Start 2P — אנגלית בלבד) ─── */
+.arcade-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(2rem, 7vw, 4rem);
+  color: #FFD700;
+  text-shadow:
+    0 0 10px #FFD700,
+    0 0 30px #FF8800,
+    0 0 60px #FF4400;
+  letter-spacing: 4px;
+  margin-bottom: 4px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* ─── כותרת משנה "צוות המנהרות" ─── */
+.tunnel-subtitle {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 900;
+  font-size: clamp(1rem, 3vw, 1.6rem);
+  color: #FFD700;
+  text-shadow: 0 0 12px #FF8800, 0 0 24px #FF4400;
+  letter-spacing: 6px;
+  margin-bottom: 6px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ─── כתוביות ─── */
+.subtitle {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  color: #aaa;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* ─── כרטיסי דמויות ─── */
+#char-cards {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.char-card {
+  background: #111;
+  border: 3px solid #333;
+  border-radius: 16px;
+  padding: 16px 14px;
+  width: 170px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+
+.char-card:hover {
+  transform: translateY(-8px);
+  border-color: #666;
+  box-shadow: 0 10px 28px rgba(255,255,255,0.12);
+}
+
+.char-card.selected {
+  border-color: #FFD700;
+  box-shadow: 0 0 20px #FFD700, 0 0 40px #FF6600;
+  transform: translateY(-10px);
+}
+
+.char-avatar {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 10px;
+}
+
+.char-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.char-color-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 5px solid;
+  pointer-events: none;
+}
+
+.char-name {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.char-speed {
+  font-family: 'Rubik', sans-serif;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+/* ─── הנחיית התחלה ─── */
+#start-prompt {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  color: #FFD700;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  text-align: center;
+  cursor: pointer;
+}
+#start-prompt:hover { color: #fff; }
+
+.hidden { visibility: hidden; }
+
+/* ─── אנימציית בהוב ─── */
+.blink { animation: blink 1s step-start infinite; }
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ─── כפתור הוספת שחקן ─── */
+.add-player-btn {
+  margin-top: 6px;
+  margin-bottom: 14px;
+  background: #1a1a2e;
+  color: #aaa;
+  border: 2px solid #333;
+  font-size: 0.9rem;
+  padding: 10px 22px;
+}
+.add-player-btn:hover {
+  background: #222244;
+  color: #fff;
+  border-color: #555;
+  transform: none;
+}
+
+/* ─── מסך הוספת שחקן ─── */
+#screen-add-player {
+  gap: 32px;
+  background: #000;
+}
+
+.add-player-msg {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 900;
+  font-size: clamp(1.4rem, 5vw, 2.4rem);
+  color: #FFD700;
+  text-align: center;
+  text-shadow: 0 0 16px #FF8800;
+  padding: 0 16px;
+  line-height: 1.5;
+  max-width: 560px;
+}
+
+/* ─── מסך משחק ─── */
+#screen-game {
+  padding: 0;
+  gap: 0;
+  justify-content: flex-start;
+}
+
+#game-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 560px;
+}
+
+#hud {
+  width: 100%;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 2px solid #1a1aff;
+  gap: 8px;
+}
+
+#hud-left, #hud-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+#hud-score-label, #hud-lives-label { color: #aaa; font-weight: 400; }
+
+#hud-score {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 900;
+  color: #FFD700;
+  min-width: 50px;
+  font-size: 1rem;
+}
+
+#hud-lives { font-size: 0.9rem; }
+
+#hud-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#hud-char-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #FFD700;
+  display: none;
+}
+
+#hud-char-name {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #ccc;
+  max-width: 110px;
+  text-align: center;
+}
+
+#gameCanvas {
+  display: block;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+/* ─── D-pad ─── */
+#dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 0 8px;
+  width: 100%;
+}
+
+#dpad-row-top, #dpad-row-bot {
+  display: flex;
+  justify-content: center;
+}
+
+#dpad-row-mid {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dpad-center {
+  width: 52px;
+  height: 52px;
+  background: #111;
+  border-radius: 50%;
+}
+
+.dpad-btn {
+  font-family: 'Rubik', sans-serif;
+  font-size: 1.3rem;
+  width: 58px;
+  height: 58px;
+  background: #1a1a2e;
+  color: #FFD700;
+  border: 2px solid #444;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s, transform 0.05s;
+  touch-action: manipulation;
+}
+
+.dpad-btn:active {
+  background: #FFD700;
+  color: #000;
+  transform: scale(0.93);
+}
+
+/* הסתר D-pad בדסקטופ — רק במובייל */
+@media (hover: hover) and (pointer: fine) {
+  #dpad { display: none; }
+}
+
+/* ─── מסך סיום ─── */
+#screen-gameover { gap: 22px; }
+
+.final-score {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  color: #4FC3F7;
+  margin-top: -8px;
+}
+
+/* ─── כפתורים כלליים ─── */
+.arcade-btn {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  background: #FFD700;
+  color: #000;
+  border: none;
+  padding: 14px 32px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: 1px;
+}
+.arcade-btn:hover {
+  background: #fff;
+  transform: scale(1.05);
+}
+.arcade-btn.secondary {
+  background: #222;
+  color: #ccc;
+  border: 2px solid #444;
+}
+.arcade-btn.secondary:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  #char-cards { gap: 10px; }
+  .char-card  { width: 130px; padding: 12px 10px; }
+  .char-avatar { width: 72px; height: 72px; }
+  .arcade-title { font-size: clamp(1.6rem, 9vw, 2.4rem); }
+}

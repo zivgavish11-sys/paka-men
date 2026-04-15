@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PAKA-MEN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══ מסך בחירת דמות ═══ -->
+  <div id="screen-select" class="screen active">
+    <h1 class="arcade-title">PAKA-MEN</h1>
+    <h2 class="tunnel-subtitle">צוות המנהרות</h2>
+    <p class="subtitle">בחר את הדמות שלך</p>
+
+    <button id="btn-add-player" class="arcade-btn add-player-btn">+ הוספת שחקן</button>
+
+    <div id="char-cards">
+
+      <div class="char-card" data-char="regel">
+        <div class="char-avatar">
+          <img src="רגל שלישית.jpeg" alt="רגל שלישית" />
+          <div class="char-color-ring" style="border-color:#FFD700;"></div>
+        </div>
+        <p class="char-name">רגל שלישית</p>
+        <p class="char-speed">מהירות: רגילה</p>
+      </div>
+
+      <div class="char-card" data-char="geshem">
+        <div class="char-avatar">
+          <img src="גשם שוטף.jpeg" alt="גשם שוטף" />
+          <div class="char-color-ring" style="border-color:#4FC3F7;"></div>
+        </div>
+        <p class="char-name">גשם שוטף</p>
+        <p class="char-speed">מהירות: מהיר</p>
+      </div>
+
+      <div class="char-card" data-char="kotel">
+        <div class="char-avatar">
+          <img src="קוטל הצעירים.jpeg" alt="קוטל הצעירים" />
+          <div class="char-color-ring" style="border-color:#EF5350;"></div>
+        </div>
+        <p class="char-name">קוטל הצעירים</p>
+        <p class="char-speed">מהירות: איטי מאוד</p>
+      </div>
+
+    </div>
+
+    <p id="start-prompt" class="blink hidden">לחץ כדי להתחיל!</p>
+  </div>
+
+  <!-- ═══ מסך הוספת שחקן ═══ -->
+  <div id="screen-add-player" class="screen">
+    <p class="add-player-msg">ימניאק רק גביש מוסיף דמויות</p>
+    <button id="btn-back-to-select" class="arcade-btn secondary">חזרה</button>
+  </div>
+
+  <!-- ═══ מסך משחק ═══ -->
+  <div id="screen-game" class="screen">
+    <div id="game-wrapper">
+      <div id="hud">
+        <div id="hud-left">
+          <span id="hud-score-label">ניקוד:</span>
+          <span id="hud-score">0</span>
+        </div>
+        <div id="hud-center">
+          <img id="hud-char-img" src="" alt="" />
+          <span id="hud-char-name"></span>
+        </div>
+        <div id="hud-right">
+          <span id="hud-lives-label">חיים:</span>
+          <span id="hud-lives">❤️❤️❤️</span>
+        </div>
+      </div>
+      <canvas id="gameCanvas" width="560" height="620"></canvas>
+
+      <!-- כפתורי D-pad למובייל -->
+      <div id="dpad">
+        <div id="dpad-row-top">
+          <button class="dpad-btn" id="btn-up">▲</button>
+        </div>
+        <div id="dpad-row-mid">
+          <button class="dpad-btn" id="btn-left">◀</button>
+          <div class="dpad-center"></div>
+          <button class="dpad-btn" id="btn-right">▶</button>
+        </div>
+        <div id="dpad-row-bot">
+          <button class="dpad-btn" id="btn-down">▼</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ מסך סיום ═══ -->
+  <div id="screen-gameover" class="screen">
+    <h1 id="gameover-title" class="arcade-title"></h1>
+    <p id="gameover-score" class="final-score"></p>
+    <button id="btn-restart" class="arcade-btn">שחק שוב</button>
+    <button id="btn-change-char" class="arcade-btn secondary">החלף דמות</button>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
