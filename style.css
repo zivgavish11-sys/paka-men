@@ -355,6 +355,7 @@ body {
 
 .dpad-btn {
   font-family: Arial, sans-serif;
+  font-variant-emoji: text;  /* force text rendering — prevents iOS emoji-style arrows */
   font-size: 1.3rem;
   width: 58px;
   height: 58px;

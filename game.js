@@ -11,7 +11,7 @@ const COLS = 28;
 const ROWS = 31;
 const TUNNEL_ROW = 14;
 
-const STATE = { SELECT: 0, READY: 1, PLAYING: 2, DEAD: 3, WIN: 4, GAMEOVER: 5 };
+const STATE = { SELECT: 0, READY: 1, PLAYING: 2, DEAD: 3, WIN: 4, GAMEOVER: 5, PAUSE: 6 };
 
 const FEAR_DURATION   = 8000;   // ms
 const FEAR_FLASH_AT   = 2000;   // ms נותרים לפני שמתחיל הבהוב
@@ -427,6 +427,14 @@ function drawOverlay() {
     ctx.fillText('מוכן', canvas.width / 2, canvas.height / 2);
     ctx.globalAlpha = 1;
   }
+  if (gameState === STATE.PAUSE) {
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 24px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('PAUSE', canvas.width / 2, canvas.height / 2);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -476,11 +484,27 @@ document.addEventListener('keyup', e => {
   }
 });
 
-// D-pad כפתורים
-document.getElementById('btn-up').addEventListener('pointerdown',    e => { e.preventDefault(); setDir({ x: 0, y:-1 }); });
-document.getElementById('btn-down').addEventListener('pointerdown',  e => { e.preventDefault(); setDir({ x: 0, y: 1 }); });
-document.getElementById('btn-left').addEventListener('pointerdown',  e => { e.preventDefault(); setDir({ x:-1, y: 0 }); });
-document.getElementById('btn-right').addEventListener('pointerdown', e => { e.preventDefault(); setDir({ x: 1, y: 0 }); });
+// D-pad: start moving on press, stop on release (mobile only — keyboard handled separately)
+function stopPlayer() {
+  if (gameState !== STATE.PLAYING && gameState !== STATE.READY) return;
+  player.x      = player.col * TILE_SIZE + TILE_SIZE / 2;
+  player.y      = player.row * TILE_SIZE + TILE_SIZE / 2;
+  player.dir    = { x: 0, y: 0 };
+  player.nextDir = { x: 0, y: 0 };
+}
+
+const DPAD_DIRS = [
+  { id: 'btn-up',    dir: { x: 0, y:-1 } },
+  { id: 'btn-down',  dir: { x: 0, y: 1 } },
+  { id: 'btn-left',  dir: { x:-1, y: 0 } },
+  { id: 'btn-right', dir: { x: 1, y: 0 } },
+];
+DPAD_DIRS.forEach(({ id, dir }) => {
+  const btn = document.getElementById(id);
+  btn.addEventListener('pointerdown',  e => { e.preventDefault(); setDir(dir); });
+  btn.addEventListener('pointerup',    e => { e.preventDefault(); stopPlayer(); });
+  btn.addEventListener('pointercancel',e => { e.preventDefault(); stopPlayer(); });
+});
 
 // Swipe על הקנבס
 (function() {
@@ -549,6 +573,22 @@ function movePlayer(dt) {
   }
 
   const spd = player.speed * (dt / 1000);
+
+  // Mid-corridor turn: if a new direction is buffered and we're close enough to
+  // the current tile center, snap and apply the turn without waiting for the next tile.
+  // Uses Math.hypot (not distX <= spd+1) to avoid the oscillation bug.
+  const nd = player.nextDir;
+  if ((nd.x !== 0 || nd.y !== 0) && (nd.x !== player.dir.x || nd.y !== player.dir.y)) {
+    const cx = player.col * TILE_SIZE + TILE_SIZE / 2;
+    const cy = player.row * TILE_SIZE + TILE_SIZE / 2;
+    if (Math.hypot(player.x - cx, player.y - cy) <= TILE_SIZE * 0.45) {
+      if (canMoveTo(player.col + nd.x, player.row + nd.y, false, false)) {
+        player.x   = cx;
+        player.y   = cy;
+        player.dir = { x: nd.x, y: nd.y };
+      }
+    }
+  }
 
   // Tile-targeting: move toward center of (col+dir, row+dir)
   const targetCol = player.col + player.dir.x;
@@ -847,6 +887,8 @@ function resetRound() {
 // ═══════════════════════════════════════════════════════════════
 
 function update(dt) {
+  if (gameState === STATE.PAUSE) return; // frozen — do not advance anything
+
   gameTimestamp += dt;
 
   if (gameState === STATE.READY) {
@@ -935,22 +977,28 @@ document.getElementById('btn-change-char').addEventListener('click', () => {
   showScreen('screen-select');
 });
 
-// ─── כפתור בית: אישור יציאה ───────────────────────────────────
+// ─── כפתור בית: השהייה ────────────────────────────────────────
 document.getElementById('btn-home').addEventListener('click', () => {
+  if (gameState !== STATE.PLAYING) return; // only pause while actively playing
+  gameState = STATE.PAUSE;
   document.getElementById('exit-overlay').classList.add('visible');
 });
 
+// "המשך לשחק" — unpause and return to game
+document.getElementById('btn-exit-no').addEventListener('click', () => {
+  document.getElementById('exit-overlay').classList.remove('visible');
+  if (gameState === STATE.PAUSE) gameState = STATE.PLAYING;
+});
+
+// "יצא לתפריט" — leave without resetting maze/score until a new game starts
 document.getElementById('btn-exit-yes').addEventListener('click', () => {
   document.getElementById('exit-overlay').classList.remove('visible');
+  gameState = STATE.SELECT;
   if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
   selectedChar = null;
   document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
   document.getElementById('start-prompt').classList.add('hidden');
   showScreen('screen-select');
-});
-
-document.getElementById('btn-exit-no').addEventListener('click', () => {
-  document.getElementById('exit-overlay').classList.remove('visible');
 });
 
 document.getElementById('btn-add-player').addEventListener('click', () => {
