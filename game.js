@@ -138,6 +138,7 @@ function createPlayer() {
     mouthDir:   1,
     alive: true,
     deadAnim: 0,
+    pendingStop: false,
   };
 }
 
@@ -427,14 +428,6 @@ function drawOverlay() {
     ctx.fillText('מוכן', canvas.width / 2, canvas.height / 2);
     ctx.globalAlpha = 1;
   }
-  if (gameState === STATE.PAUSE) {
-    ctx.fillStyle = 'rgba(0,0,0,0.55)';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = '#FFD700';
-    ctx.font = 'bold 24px "Press Start 2P", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('PAUSE', canvas.width / 2, canvas.height / 2);
-  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -487,10 +480,8 @@ document.addEventListener('keyup', e => {
 // D-pad: start moving on press, stop on release (mobile only — keyboard handled separately)
 function stopPlayer() {
   if (gameState !== STATE.PLAYING && gameState !== STATE.READY) return;
-  player.x      = player.col * TILE_SIZE + TILE_SIZE / 2;
-  player.y      = player.row * TILE_SIZE + TILE_SIZE / 2;
-  player.dir    = { x: 0, y: 0 };
-  player.nextDir = { x: 0, y: 0 };
+  player.nextDir    = { x: 0, y: 0 }; // clear buffered turn
+  player.pendingStop = true;           // finish current tile movement, then stop
 }
 
 const DPAD_DIRS = [
@@ -574,18 +565,25 @@ function movePlayer(dt) {
 
   const spd = player.speed * (dt / 1000);
 
-  // Mid-corridor turn: if a new direction is buffered and we're close enough to
-  // the current tile center, snap and apply the turn without waiting for the next tile.
-  // Uses Math.hypot (not distX <= spd+1) to avoid the oscillation bug.
+  // Turn logic — applies to all inputs (D-pad and keyboard alike)
   const nd = player.nextDir;
-  if ((nd.x !== 0 || nd.y !== 0) && (nd.x !== player.dir.x || nd.y !== player.dir.y)) {
-    const cx = player.col * TILE_SIZE + TILE_SIZE / 2;
-    const cy = player.row * TILE_SIZE + TILE_SIZE / 2;
-    if (Math.hypot(player.x - cx, player.y - cy) <= TILE_SIZE * 0.45) {
-      if (canMoveTo(player.col + nd.x, player.row + nd.y, false, false)) {
-        player.x   = cx;
-        player.y   = cy;
-        player.dir = { x: nd.x, y: nd.y };
+  if (nd.x !== 0 || nd.y !== 0) {
+    // U-turn (180°): always allowed immediately — no tile-center needed
+    const isUTurn = (nd.x === -player.dir.x && nd.y === -player.dir.y);
+    if (isUTurn) {
+      player.x   = player.col * TILE_SIZE + TILE_SIZE / 2;
+      player.y   = player.row * TILE_SIZE + TILE_SIZE / 2;
+      player.dir = { x: nd.x, y: nd.y };
+    } else if (nd.x !== player.dir.x || nd.y !== player.dir.y) {
+      // Perpendicular turn: allow when within half a tile of the current tile center
+      const cx = player.col * TILE_SIZE + TILE_SIZE / 2;
+      const cy = player.row * TILE_SIZE + TILE_SIZE / 2;
+      if (Math.hypot(player.x - cx, player.y - cy) <= TILE_SIZE * 0.5) {
+        if (canMoveTo(player.col + nd.x, player.row + nd.y, false, false)) {
+          player.x   = cx;
+          player.y   = cy;
+          player.dir = { x: nd.x, y: nd.y };
+        }
       }
     }
   }
@@ -614,6 +612,13 @@ function movePlayer(dt) {
     player.y   = ty;
     player.col = targetCol;
     player.row = targetRow;
+
+    // D-pad release requested a stop — halt here at tile center
+    if (player.pendingStop) {
+      player.dir        = { x: 0, y: 0 };
+      player.pendingStop = false;
+      return;
+    }
 
     const nd = player.nextDir;
     if (nd.x !== 0 || nd.y !== 0) {
